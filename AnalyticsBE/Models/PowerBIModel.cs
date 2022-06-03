@@ -31,9 +31,11 @@ namespace AnalyticsBE.Models
 
             // Create client credential
             var clientCredential = new ClientCredential(userName,userPassword);
+            var userAssertion = new UserAssertion(userName,userPassword);
 
             // Get user object id
-            var token = authContext.AcquireTokenAsync(resourceUri, clientID, new Uri(redirectUri)).Result.AccessToken;
+           
+            var token = authContext.AcquireTokenAsync(resourceUri, clientCredential, userAssertion).Result.AccessToken;
 
             Console.WriteLine(token);
             Console.ReadLine();
@@ -62,6 +64,7 @@ namespace AnalyticsBE.Models
                     datasets = oResponse.SelectToken("datasets").ToObject<List<PowerBIDataset>>();
                 }
             }
+
 
             return datasets;
         }
