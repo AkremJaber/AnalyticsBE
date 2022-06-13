@@ -1,11 +1,18 @@
+using AnalyticsBE.Services.Implementations;
+using AnalyticsBE.Services.Interfaces;
+using System.Configuration;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+builder.Services.AddSingleton<IPowerBIModelService, PowerBIModelImpl>();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+//builder.Services.Configure<appSettings>(Configuration.GetSection("appSettings"));
+
 
 var app = builder.Build();
 

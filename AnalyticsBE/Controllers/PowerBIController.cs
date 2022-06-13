@@ -1,41 +1,37 @@
 ﻿using AnalyticsBE.Models;
+using AnalyticsBE.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Identity.Web.Resource;
 
 namespace AnalyticsBE.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
+    
     public class PowerBIController : ControllerBase
     {
-        [HttpGet]
-        public async Task<List<PowerBIDataset>> GetDatasets()
+        public  IPowerBIModelService pbis;
+        
+
+        public PowerBIController(IPowerBIModelService pbis )
         {
-            return await PowerBIModel.GetDatasets();
+            this.pbis = pbis;
+            
         }
 
         [HttpGet]
-        public async Task<PowerBIDataset> GetDataset(Guid id)
+        public async Task<List<EmbeddedDataset>> GetDatasets()
         {
-            return await PowerBIModel.GetDataset(id);
+            return await pbis.GetDatasets();
         }
 
-        [HttpPost]
-        public async Task<Guid> CreateDataset(PowerBIDataset dataset)
-        {
-            return await PowerBIModel.CreateDataset(dataset);
-        }
 
-        [HttpPost]
-        public async Task<bool> ClearTable(PowerBITableRef tableRef)
-        {
-            return await PowerBIModel.ClearTable(tableRef.datasetId, tableRef.tableName);
-        }
 
-        [HttpPost]
-        public async Task<bool> AddTableRows(PowerBITableRows rows)
-        {
-            return await PowerBIModel.AddTableRows(rows.datasetId, rows.tableName, rows.rows);
-        }
+
+
+
     }
 }
