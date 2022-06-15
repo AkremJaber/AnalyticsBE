@@ -6,23 +6,39 @@ namespace AnalyticsBE.Utils
 {
     public class Settings
     {
-        public static Settings Default { get; set; } = new Settings();
+
+        public IConfigurationBuilder builder = new ConfigurationBuilder();
+        
         public  string ClientId
         {
-            get { return  System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"]; }
-
+            get
+            {
+                
+                builder.AddJsonFile("appSettings.json");
+                var configurationRoot = builder.Build();
+                return configurationRoot.GetSection("ServicePrincipalApp").GetSection("clientid").Value;
+            }
         }
 
         public  string Key
         {
-            get {var config = new ConfigurationRoot(null);
-                return config.GetSection("appSettings").GetSection("ServicePrincipalApp").GetSection("ClientId").Value ;
-               }
+            get
+            {
+                
+                builder.AddJsonFile("appSettings.json");
+                var configurationRoot = builder.Build();
+                return configurationRoot.GetSection("ServicePrincipalApp").GetSection("ClientSecret").Value;
+            }
         }
 
         public  string AzureAdTenantId
         {
-            get { return System.Configuration.ConfigurationManager.AppSettings["ida:TenantId"]; }
+            get
+            {
+                builder.AddJsonFile("appSettings.json");
+                var configurationRoot = builder.Build();
+                return configurationRoot.GetSection("ServicePrincipalApp").GetSection("TenantId").Value;
+            }
         }
 
         public  string PowerBIResourceId
@@ -45,4 +61,18 @@ namespace AnalyticsBE.Utils
             get { return "http://schemas.microsoft.com/identity/claims/objectidentifier"; }
         }
     }
+    //public string Key
+    //{
+    //    get
+    //    {
+    //        var config = new ConfigurationRoot(null);
+    //        return config.GetSection("appSettings").GetSection("ServicePrincipalApp").GetSection("ClientId").Value;
+    //    }
+
+    //public string ClientId
+    //{
+    //    get { return System.Configuration.ConfigurationManager.AppSettings["ida:ClientID"]; }
+
+    //}
 }
+

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Identity.Web.Resource;
+using Microsoft.PowerBI.Api.Models;
 
 namespace AnalyticsBE.Controllers
 {
@@ -23,7 +24,7 @@ namespace AnalyticsBE.Controllers
         }
 
         [HttpGet]
-        public async Task<List<EmbeddedDataset>> GetDatasets()
+        public async Task<List<Dataset>> GetDatasets()
         {
             return await pbis.GetDatasets();
         }

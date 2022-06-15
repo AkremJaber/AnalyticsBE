@@ -7,24 +7,29 @@ using Microsoft.PowerBI.Api;
 using Microsoft.PowerBI.Api.Models;
 using Microsoft.Rest;
 using Newtonsoft.Json.Linq;
+using System.Collections;
 using System.Security.Claims;
 
 namespace AnalyticsBE.Services.Implementations
 {
     public class PowerBIModelImpl : IPowerBIModelService
     {
-         Uri baseAddress = new Uri("https://api.powerbi.com/beta/myorg/");
+        public Uri baseAddress = new("https://api.powerbi.com/beta/myorg/");
+        public const string powerbiApiDefaultScope = "https://analysis.windows.net/powerbi/api/.default";
+        public string urlPowerBiServiceApiRoot { get; }
         public IConfiguration configuration;
+        public ITokenAcquisition tokenAcquisition { get; }
 
-        public PowerBIModelImpl (IConfiguration configuration)
+        public PowerBIModelImpl(IConfiguration configuration, ITokenAcquisition tokenAcquisition)
         {
             this.configuration = configuration;
+            this.tokenAcquisition = tokenAcquisition;
         }
 
-        public async Task<List<EmbeddedDataset>> GetDatasets()
+        public async Task<List<Dataset>> GetDatasets()
         {
-            List<EmbeddedDataset> datasets = new List<EmbeddedDataset>();
-            var token = await getAccessToken();
+            List<Dataset> datasets = new List<Dataset>();
+            var token = getAccessToken();
 
             using (var client = new HttpClient { BaseAddress = baseAddress })
             {
@@ -35,29 +40,41 @@ namespace AnalyticsBE.Services.Implementations
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
                     JObject oResponse = JObject.Parse(responseString);
-                    datasets = oResponse.SelectToken("datasets").ToObject<List<EmbeddedDataset>>();
+                     datasets = oResponse.SelectToken("datasets").ToObject<List<Dataset>>();
                 }
             }
 
             return datasets;
         }
 
-        public async Task<string> getAccessToken()
+
+        public string getAccessToken()
         {
-            var setting = new Settings();
-            // Create auth context (note: token is not cached)
-            AuthenticationContext authContext = new AuthenticationContext(setting.AzureADAuthority);
+            return this.tokenAcquisition.GetAccessTokenForAppAsync(powerbiApiDefaultScope).Result;
+            //var setting = new Settings();
+            //// Create auth context (note: token is not cached)
+            //AuthenticationContext authContext = new AuthenticationContext(setting.AzureADAuthority);
 
-            // Create client credential
-            var clientCredential = new ClientCredential(setting.ClientId, setting.Key);
+            //// Create client credential
+            //var clientCredential = new ClientCredential(setting.ClientId, setting.Key);
 
-            // Get user object id
-            var userObjectId = ClaimsPrincipal.Current.FindFirst(setting.ClaimTypeObjectIdentifier).Value;
+            //////Get user object id
+            
+            //var userObjectId = ClaimsPrincipal.Current.FindFirst(setting.ClaimTypeObjectIdentifier).Value;
 
-            // Get access token for Power BI
-            // Call Power BI APIs from Web API on behalf of a user
-            Task<AuthenticationResult> test = authContext.AcquireTokenAsync(setting.PowerBIResourceId, clientCredential, new UserAssertion(userObjectId, UserIdentifierType.UniqueId.ToString()));
-            return test.Result.AccessToken;
+            //// Get access token for Power BI
+            //// Call Power BI APIs from Web API on behalf of a user
+            //Task<AuthenticationResult> test = authContext.AcquireTokenAsync(setting.PowerBIResourceId, clientCredential, new UserAssertion(userObjectId, UserIdentifierType.UniqueId.ToString()));
+            //return test.Result.AccessToken;
         }
+
+        public PowerBIClient GetPowerBiClient()
+        {
+            var tokenCredentials = new TokenCredentials(getAccessToken(), "Bearer");
+            return new PowerBIClient(new Uri(urlPowerBiServiceApiRoot), tokenCredentials);
+        }
+
     }
+
+   
 }
