@@ -14,7 +14,7 @@ namespace AnalyticsBE.Services.Implementations
 {
     public class PowerBIModelImpl : IPowerBIModelService
     {
-        public Uri baseAddress = new("https://api.powerbi.com/beta/myorg/");
+        public Uri baseAddress = new("https://api.powerbi.com/v1.0/myorg/");
         public const string powerbiApiDefaultScope = "https://analysis.windows.net/powerbi/api/.default";
         public string urlPowerBiServiceApiRoot { get; }
         public IConfiguration configuration;
@@ -39,11 +39,11 @@ namespace AnalyticsBE.Services.Implementations
                 using (var response = await client.GetAsync(String.Format("{0}/datasets", baseAddress)))
                 {
                     string responseString = await response.Content.ReadAsStringAsync();
+                    
                     JObject oResponse = JObject.Parse(responseString);
                      datasets = oResponse.SelectToken("datasets").ToObject<List<Dataset>>();
                 }
             }
-
             return datasets;
         }
 
@@ -59,8 +59,8 @@ namespace AnalyticsBE.Services.Implementations
             //var clientCredential = new ClientCredential(setting.ClientId, setting.Key);
 
             //////Get user object id
-            
-            //var userObjectId = ClaimsPrincipal.Current.FindFirst(setting.ClaimTypeObjectIdentifier).Value;
+            //ClaimsPrincipal claimsPrincipal = new ClaimsPrincipal();
+            //var userObjectId = claimsPrincipal.FindFirst(setting.ClaimTypeObjectIdentifier).Value;
 
             //// Get access token for Power BI
             //// Call Power BI APIs from Web API on behalf of a user

@@ -16,7 +16,7 @@ public class Startup
           .EnableTokenAcquisitionToCallDownstreamApi()
           .AddInMemoryTokenCaches();
         //services.AddHttpClient();
-        //services.AddControllers();
+        services.AddControllers();
         services.AddScoped<IPowerBIModelService, PowerBIModelImpl>();
         //services.AddTransient<Microsoft.Identity.Web.ITokenAcquisition, tokenAcquisition>();
 
